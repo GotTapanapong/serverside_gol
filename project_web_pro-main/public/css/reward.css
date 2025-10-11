@@ -1,0 +1,202 @@
+/* พื้นฐาน */
+@font-face {
+    font-family: 'Kanit';
+    src: url('/fonts/Kanit-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* สำหรับ Chrome, Edge, และ Safari */
+::-webkit-scrollbar {
+    width: 10px; /* ความกว้างของ Scroll Bar */
+}
+
+::-webkit-scrollbar-track {
+    background: #F8F4E1; /* สีพื้นหลังของ Scroll Bar */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #543310; /* สีของตัว Scroll */
+    border-radius: 5px; /* ทำให้ Scroll Bar มีขอบโค้ง */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6a4420; /* เปลี่ยนสีเมื่อ Hover */
+}
+
+  /* พื้นหลังของ Navbar */
+  .bg-brown {
+    background-color: #543310;
+    padding: 10px 20px;
+    width: 100%;
+  }
+  
+  /* Layout ของ Navbar */
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+  
+  .container.active {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 คอลัมน์ ขนาดเท่ากัน */
+    gap: 20px;
+    /* ระยะห่างระหว่างคอลัมน์ */
+    padding: 20px;
+  }
+  
+  /* โลโก้ */
+  .logo-img {
+    height: 55px;
+    width: auto;
+  }
+  
+  /* เมนูหลัก */
+  .nav-menu {
+    list-style: none;
+    display: none;
+    flex-direction: column;
+    gap: 60px;
+    text-align: center;
+    padding: 0;
+    font-family: 'Kanit';
+  }
+  
+  .nav-menu.active {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+  .nav-menu li {
+    margin: 10px 0;
+  }
+  
+  .nav-menu a {
+    color: #F8F4E1;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  
+  #btn-logout {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-family: 'Kanit';
+  }
+  
+  #btn-logout {
+    color: #F8F4E1;
+    background-color: #543310;
+    margin-left: 5vh;
+    border-radius: 4vh;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    /* เพิ่มเงา */
+    font-family: 'Kanit';
+  }
+  
+  /* Hamburger Menu */
+  .hamburger {
+    background: none;
+    border: none;
+    color: #F8F4E1;
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+  }
+  
+  /* Responsive สำหรับหน้าจอขนาดใหญ่ */
+  @media (min-width: 768px) {
+    .nav-menu {
+      display: flex;
+      flex-direction: row;
+      gap: 100px;
+    }
+  
+    .hamburger {
+      display: none;
+    }
+  }
+  
+  html,
+  body {
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    background-color: #74512D;
+    scrollbar-width: thin;
+    /* กำหนดความกว้างของ Scroll Bar (สำหรับ Firefox) */
+    scrollbar-color: #543310 #F8F4E1;
+    /* สี Scroll Bar */
+    margin: 0;
+    padding: 0;
+  }
+
+  .card {
+    background-color: #FAF3E0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 60%;
+}
+
+/* ตาราง */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #5D4037;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #D7CCC8;
+}
+
+/* ปุ่มเพิ่ม/ลดแต้ม */
+.btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+}
+
+.plus {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.minus {
+    background-color: #D32F2F;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card {
+        width: 90%;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+}

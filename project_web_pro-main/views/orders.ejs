@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำสั่งซื้อ</title>
+    <link rel="stylesheet" href="/css/order.css">
+</head>
+
+<body>
+    <nav id="navbar">
+        <div class="navbar-header">
+            <img src="/images/logo.png" alt="MONGCHA Logo" class="navbar-brand">
+            <button id="menu-toggle" class="menu-toggle">☰</button>
+            <script src="/js/script.js"></script>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="#">หน้าหลัก</a></li>
+            <li><a href="/menu">เมนู</a></li>
+            <li><a href="/cart">ตะกร้า</a></li>
+            <li><a href="/orders">คำสั่งซื้อ</a></li>
+            <!-- เพิ่มปุ่ม "ลงชื่อเข้าใช้" และ "ลงทะเบียน" -->
+            <li><a href="/logout" id="btn-logout" class="btn-logout">ลงชื่อออก</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <p>
+            <%= id_user %>
+        </p>
+        <h1>คำสั่งซื้อ</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>หมายเลขคำสั่งซื้อ</th>
+                    <th>วันเวลา</th>
+                    <th>ราคา</th>
+                    <th>รายละเอียด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(order=> { %>
+                    <tr>
+                        <td>หมายเลขสั่งซื้อ <%= order.order_id %>
+                        </td>
+                        <td>
+                            <%= order.datetime %>
+                        </td>
+                        <td>฿<%= order.total_price %>
+                        </td>
+                        <td><button class="description"
+                                onclick="viewDetails('<%= order.order_id %>')">ดูรายละเอียด</button></td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // เปิด-ปิด Navbar เมื่อคลิกขีดสามขีด
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            const navbarMenu = document.querySelector('.navbar-menu');
+            navbarMenu.classList.toggle('active');
+        });
+
+        function viewDetails(orderId) {
+            // Redirect to the show_order_user page with the orderId in the URL
+            window.location.href = `/show-order-user/${orderId}`;
+        }
+
+    </script>
+</body>
+
+</html>

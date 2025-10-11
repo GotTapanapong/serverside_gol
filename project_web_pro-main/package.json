@@ -1,0 +1,29 @@
+{
+  "name": "final_project",
+  "version": "1.0.0",
+  "description": "testttt",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.7",
+    "sweetalert2": "^11.17.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maxkrit/project_web_pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maxkrit/project_web_pro/issues"
+  },
+  "homepage": "https://github.com/Maxkrit/project_web_pro#readme"
+}

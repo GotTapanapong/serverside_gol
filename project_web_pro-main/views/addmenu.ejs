@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการเมนู</title>
+    <link rel="stylesheet" href="/css/addmenu.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="navbar-header">
+            <img src="/images/logo.png" alt="MONGCHA Logo" class="navbar-brand">
+            <button id="menu-toggle" class="menu-toggle">☰</button>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="/order_seller">จัดการคำสั่งซื้อ</a></li>
+            <li><a href="/addmenu">จัดการเมนู</a></li>
+            <li><a href="/logout">ลงชื่อออก</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <h2>จัดการเมนู</h2>
+
+        <div class="menu-form">
+            <form id="add-product-form">
+                <input type="text" id="product_name" placeholder="ชื่อสินค้า" required>
+                <input type="number" id="price" placeholder="ราคา" step="0.01" required>
+                <input type="text" id="description" placeholder="รายละเอียด" required>
+                <input type="file" id="image_product" name="image_product" accept="image/*" required>
+                <button type="submit" class="btn-add">เพิ่มสินค้า</button>
+            </form>
+        </div>
+    
+        <div class="scrollable-table">
+            <table id="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ชื่อสินค้า</th>
+                        <th>ราคา</th>
+                        <th>รายละเอียด</th>
+                        <th>รูปภาพ</th>
+                        <th>ลบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                document.querySelector('.navbar-menu').classList.toggle('active');
+            });
+
+            const addForm = document.getElementById('add-product-form');
+            const productTableBody = document.querySelector('#product-table tbody');
+
+            // 1. ฟังก์ชันดึงและแสดงข้อมูล
+            async function fetchProducts() {
+                try {
+                    // แก้ไข: เรียกใช้ Route ที่ถูกต้อง (/get-products) และใช้ GET method
+                    const response = await fetch('/get-products'); 
+                    const data = await response.json();
+
+                    if (!data.success) throw new Error(data.message);
+
+                    productTableBody.innerHTML = '';
+                    data.products.forEach(product => {
+                        const row = document.createElement('tr');
+                        // แก้ไข: เอาคอลัมน์ stock ออก
+                        row.innerHTML = `
+                            <td>${product.product_id}</td>
+                            <td>${product.product_name}</td>
+                            <td>${product.price}</td>
+                            <td>${product.description || '-'}</td>
+                            <td><img src="data:image/png;base64,${product.image_product}" alt="${product.product_name}" width="60"></td>
+                            <td><button class="btn-delete" data-id="${product.product_id}">ลบ</button></td>
+                        `;
+                        productTableBody.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                    alert('ไม่สามารถโหลดข้อมูลสินค้าได้');
+                }
+            }
+
+            // 2. ฟังก์ชันเพิ่มสินค้า
+            addForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('product_name', document.getElementById('product_name').value);
+                formData.append('price', document.getElementById('price').value);
+                formData.append('description', document.getElementById('description').value);
+                // formData.append('stock', document.getElementById('stock').value); <-- ลบออก
+                formData.append('image_product', document.getElementById('image_product').files[0]);
+
+                try {
+                    const response = await fetch('/add-product', { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        addForm.reset();
+                        fetchProducts();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                }
+            });
+
+            // 3. ฟังก์ชันลบสินค้า
+            productTableBody.addEventListener('click', async function(event) {
+                if (event.target.classList.contains('btn-delete')) {
+                    const productId = event.target.dataset.id;
+                    if (confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบสินค้า ID: ${productId}?`)) {
+                        try {
+                            const response = await fetch(`/delete-product/${productId}`, { method: 'DELETE' });
+                            const result = await response.json();
+                            if (response.ok) {
+                                alert(result.message);
+                                fetchProducts();
+                            } else {
+                                throw new Error(result.error);
+                            }
+                        } catch (error) {
+                            alert('เกิดข้อผิดพลาด: ' + error.message);
+                        }
+                    }
+                }
+            });
+
+            fetchProducts();
+        });
+    </script>
+</body>
+</html>

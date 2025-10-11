@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำสั่งซื้อ</title>
+    <link rel="stylesheet" href="/css/address.css">
+</head>
+
+<body>
+<nav id="navbar">
+    <div class="navbar-header">
+        <img src="/images/logo.png" alt="MONGCHA Logo" class="navbar-brand">
+        <button id="menu-toggle" class="menu-toggle">☰</button>
+        <script src="/js/script.js"></script>
+    </div>
+    <ul class="navbar-menu">
+        <li><a href="#">หน้าหลัก</a></li>
+        <li><a href="/menu">เมนู</a></li>
+        <li><a href="/cart">ตะกร้า</a></li>
+        <li><a href="/orders">คำสั่งซื้อ</a></li>
+        <li><a href="/point">แต้ม</a></li>
+        <li><a href="/about">เกี่ยวกับ</a></li>
+
+        <!-- เพิ่มปุ่ม "ลงชื่อเข้าใช้" และ "ลงทะเบียน" -->
+        <li><a href="/logout" id="btn-logout" class="btn-logout">ลงชื่อออก</a></li>
+    </nav>
+    
+    <div class="container">
+        <p><%= id_user %></p> 
+        <h1 style="font-family: 'Kanit', sans-serif;">ที่อยู่ใหม่</h1>
+        <form class="insert_address" action="/address" method="POST">
+            <input readonly type="hidden" id="user_id" name="user_id" value="<%= id_user %>">
+            <label>ช่องทางการติดต่อ : </label>
+            <input type="text" name="full_name" placeholder="ชื่อ นามสกุล" required><br>
+            <input type="text" name="phone_number" placeholder="หมายเลขโทรศัพท์" required><br>
+
+            <label>ที่อยู่ : </label>
+            <input type="text" name="province" placeholder="จังหวัด" required><br>
+            <input type="text" name="district" placeholder="เขต/อำเภอ" required><br>
+            <input type="text" name="subdistrict" placeholder="แขวง/ตำบล" required><br>
+            <input type="text" name="postal_code" placeholder="รหัสไปรษณีย์" required><br>
+
+            <button type="submit" class="submit">เพิ่มที่อยู่</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // console.log("Script loaded!"); // ✅ Check if script runs
+
+            // // 1️⃣ Extract user_id from URL
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const userId = urlParams.get("user_id");
+
+            // if (userId) {
+            //     document.getElementById("user_id").value = userId;
+            //     console.log("User ID set:", userId); // ✅ Check if user_id is correctly set
+            // } else {
+            //     alert("User ID is missing. Redirecting to login...");
+            //     window.location.href = "/login";
+            //     return;
+            // }
+
+            // 2️⃣ Handle form submission
+            document.querySelector(".insert_address").addEventListener("submit", async function (event) {
+                event.preventDefault(); // Prevent page reload
+                console.log("Submit button clicked!"); // ✅ Check if event fires
+
+                let submitButton = document.querySelector(".insert_address button[type='submit']");
+                submitButton.disabled = true; // Prevent multiple clicks
+
+                // Collect form data
+                const formData = new FormData(this);
+                const formObject = Object.fromEntries(formData.entries());
+                console.log("Form Data:", formObject); // ✅ Check form data before sending
+
+                // Validate required fields
+                for (const key in formObject) {
+                    if (formObject[key].trim() === "") {
+                        alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+                        submitButton.disabled = false;
+                        return;
+                    }
+                }
+
+                try {
+                    const response = await fetch("/address", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(formObject),
+                    });
+
+                    console.log("Response received:", response); // ✅ Check if response is received
+
+                    const data = await response.json();
+                    console.log("Response data:", data); // ✅ Log response data
+
+                    if (response.ok) {
+                        alert("เพิ่มที่อยู่สำเร็จ!");
+                        window.location.href = "/cart"; // Redirect to cart page
+                    } else {
+                        alert("เกิดข้อผิดพลาด: " + data.message);
+                        submitButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("เกิดข้อผิดพลาด กรุณาลองใหม่!");
+                    submitButton.disabled = false;
+                }
+            });
+        });
+
+        // เปิด-ปิด Navbar เมื่อคลิกขีดสามขีด
+document.getElementById('menu-toggle').addEventListener('click', function() {
+    const navbarMenu = document.querySelector('.navbar-menu');
+    navbarMenu.classList.toggle('active');
+});
+    </script>
+
+
+
+</body>
+
+</html>

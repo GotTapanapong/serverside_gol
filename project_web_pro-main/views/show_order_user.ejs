@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดคำสั่งซื้อ</title>
+    <link rel="stylesheet" href="/css/show_order_user.css">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="navbar-header">
+            <img src="/images/logo.png" alt="MONGCHA Logo" class="navbar-brand">
+            <button id="menu-toggle" class="menu-toggle">☰</button>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="#">หน้าหลัก</a></li>
+            <li><a href="/menu">เมนู</a></li>
+            <li><a href="/cart">ตะกร้า</a></li>
+            <li><a href="/orders">คำสั่งซื้อ</a></li>
+            <li><a href="/about">เกี่ยวกับ</a></li>
+            <li><a href="/logout" id="btn-logout" class="btn-logout">ลงชื่อออก</a></li>
+        </ul>
+    </nav>
+
+<div class="container">
+    <h2>รายละเอียดคำสั่งซื้อ</h2>
+
+    <% if (order) { %>
+        <div class="status-container">
+            <h3>สถานะล่าสุด: <span class="status-<%= order.status %>"><%= order.status %></span></h3>
+        </div>
+    <% } %>
+
+    <table>
+        <thead>
+            <tr>
+                <th>คำสั่งซื้อ</th>
+                <th>ชื่อสินค้า</th>
+                <th>จำนวน</th>
+                <th>ราคา</th>
+                <th>ระดับความหวาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% order_items.forEach(item => { %>
+                <tr>
+                    <td><%= item.order_id %></td>
+                    <td><%= item.product_name %></td>
+                    <td><%= item.quantity %></td>
+                    <td><%= item.price.toFixed(2) %></td> <td><%= item.sweetness_level %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .status-container {
+        text-align: center;
+        padding: 15px;
+        background-color: #f2f2f2;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .status-container h3 {
+        margin: 0;
+        font-size: 1.2em;
+    }
+    .status-pending { color: #f39c12; font-weight: bold; }
+    .status-processing { color: #3498db; font-weight: bold; }
+    .status-completed { color: #2ecc71; font-weight: bold; }
+</style>
+</body>
+<script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+        const navbarMenu = document.querySelector('.navbar-menu');
+        navbarMenu.classList.toggle('active');
+    });
+</script>
+</html>
