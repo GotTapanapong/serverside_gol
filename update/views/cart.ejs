@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตะกร้าสินค้า | MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <%- include("partials/navbar_user") %>
+
+  <!-- เนื้อหาหลัก -->
+  <main class="flex flex-col justify-center items-center flex-1 mb-10 mt-5 px-6">
+    <div class="bg-[#F8F4E1] p-8 rounded-2xl shadow-xl w-full max-w-4xl text-center font-[Kanit]">
+      <h1 class="text-3xl font-extrabold text-[#543310] mb-4">ตะกร้าสินค้า</h1>
+
+      <!-- ตารางสินค้า -->
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg">
+          <thead>
+            <tr class="bg-[#e6d7b9] text-[#543310]">
+              <th class="py-2 px-4 border">รูปภาพ</th>
+              <th class="py-2 px-4 border">ชื่อเมนู</th>
+              <th class="py-2 px-4 border">ราคาต่อแก้ว</th>
+              <th class="py-2 px-4 border">ความหวาน</th>
+              <th class="py-2 px-4 border">จำนวน</th>
+              <th class="py-2 px-4 border">ราคารวม</th>
+            </tr>
+          </thead>
+          <tbody id="cart-list" class="text-gray-700">
+            <!-- แสดงข้อมูลตะกร้า -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- รวมทั้งหมด -->
+      <div class="mt-6 flex justify-center items-center text-lg text-[#543310] space-x-2">
+        <span>รวมทั้งหมด:</span>
+        <span id="totalPrice">฿0.00</span>
+      </div>
+
+      <!-- ปุ่มชำระเงิน -->
+      <button id="payBtn"
+        class="mt-6 bg-[#543310] text-[#F8F4E1] px-8 py-3 rounded-full hover:bg-[#6A4525] transition">
+        ชำระเงิน
+      </button>
+    </div>
+  </main>
+
+  <!-- Script -->
+  <script>
+    // --- ดึงข้อมูลตะกร้ามาแสดงผล ---
+    fetch("/getCart")
+      .then(response => response.json())
+      .then(data => {
+        const cartList = document.getElementById("cart-list");
+        cartList.innerHTML = "";
+        let total = 0;
+
+        if (!data.cart || data.cart.length === 0) {
+          cartList.innerHTML =
+            "<tr><td colspan='6' class='py-4 text-gray-500'>ยังไม่มีสินค้าลงในตะกร้า</td></tr>";
+          document.getElementById("payBtn").disabled = true;
+          document.getElementById("payBtn").classList.add("opacity-50", "cursor-not-allowed");
+          return;
+        }
+
+        data.cart.forEach(item => {
+          const row = document.createElement("tr");
+          const itemTotalPrice = item.price * item.quantity;
+          total += itemTotalPrice;
+
+          row.innerHTML = `
+            <td class='border py-2'><img src="data:image/png;base64,${item.image_product}" 
+              alt="${item.productName}" class='w-20 h-auto rounded-lg mx-auto'></td>
+            <td class='border py-2'>${item.productName}</td>
+            <td class='border py-2 text-[#543310] font-bold'>฿${item.price.toFixed(2)}</td>
+            <td class='border py-2'>${item.sweetness}</td>
+            <td class='border py-2'>${item.quantity}</td>
+            <td class='border py-2 text-[#543310] font-bold'>฿${itemTotalPrice.toFixed(2)}</td>`;
+          cartList.appendChild(row);
+        });
+
+        document.getElementById("totalPrice").textContent = `฿${total.toFixed(2)}`;
+      })
+      .catch(error => console.error("Error loading cart:", error));
+
+    // ฟังก์ชันชำระเงิน
+    document.getElementById("payBtn").addEventListener("click", () => {
+      const totalPrice = document.getElementById("totalPrice").textContent.replace("฿", "");
+      localStorage.setItem("totalPrice", totalPrice);
+      console.log(`บันทึกราคารวม ${totalPrice} ลง localStorage แล้ว`);
+      window.location.href = "/payment";
+    });
+  </script>
+</body>
+
+</html>

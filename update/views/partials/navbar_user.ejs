@@ -1,0 +1,52 @@
+<!-- Navbar -->
+<nav class="fixed w-full bg-[#543310] text-white shadow-md z-50">
+  <div class="flex items-center justify-between px-6 py-3 w-full">
+    <!-- โลโก้ -->
+    <a href="/" class="flex items-center space-x-2">
+      <img src="/images/logo.png" alt="Logo" class="h-10 w-auto">
+    </a>
+
+    <!-- จอใหญ่ -->
+    <ul class="hidden md:flex space-x-10">
+      <li><a href="/menu" class="hover:text-orange-200">เมนู</a></li>
+      <li><a href="/cart" class="hover:text-orange-200">ตะกร้า</a></li>
+      <li><a href="/orders" class="hover:text-orange-200">คำสั่งซื้อ</a></li>
+    </ul>
+
+    <!-- ปุ่ม Logout-->
+    <div class="hidden md:flex space-x-4">
+      <a href="/logout"
+         class="px-4 py-2 rounded-full bg-orange-100 text-[#543310] shadow hover:bg-orange-200 transition">
+        ลงชื่อออก
+      </a>
+    </div>
+
+    <!-- Hamburger -->
+    <button id="toggle-btn" class="md:hidden text-2xl focus:outline-none">☰</button>
+  </div>
+
+  <!-- จอเล็ก -->
+  <div id="mobile-menu" class="hidden flex-col space-y-4 px-6 py-4 bg-[#543310] text-center w-full md:hidden">
+    <a href="/menu" class="hover:bg-amber-950 rounded-lg p-1">เมนู</a>
+    <a href="/cart" class="hover:bg-amber-950 rounded-lg p-1">ตะกร้า</a>
+    <a href="/orders" class="hover:bg-amber-950 rounded-lg p-1">คำสั่งซื้อ</a>
+    <a href="/logout"
+       class="block px-4 py-2 rounded-full bg-orange-100 text-[#543310] font-bold shadow hover:bg-orange-200 text-center">
+      ลงชื่อออก
+    </a>
+  </div>
+</nav>
+
+<div class="h-[80px] w-full"></div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById("toggle-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    toggleBtn.addEventListener("click", function () {
+      mobileMenu.classList.toggle("hidden");
+      mobileMenu.classList.toggle("flex");
+    });
+  });
+</script>

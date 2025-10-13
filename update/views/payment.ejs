@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MONGCHA - ชำระเงิน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen flex flex-col font-[Kanit]">
+  <!-- Navbar -->
+  <%- include("partials/navbar_user") %>
+
+    <!-- ส่วนชำระเงิน -->
+    <main class="flex flex-col flex-1 justify-center items-center px-6 mb-8">
+      <img src="/images/logo.png" alt="MONGCHA Logo" class="mx-auto w-48 mb-6">
+      <div class="bg-[#F8F4E1] w-full max-w-xl p-8 rounded-2xl shadow-xl text-center">
+        <h2 class="text-3xl font-extrabold text-[#543310] mb-6">ชำระเงิน</h2>
+
+        <!-- เลือกที่อยู่ -->
+        <div id="addressInput"
+          class="bg-[#D2A679] text-[#543310] font-bold py-3 px-4 rounded-lg cursor-pointer hover:bg-[#C08C5F] mb-6 transition w-4/5 mx-auto">
+          <span id="selectedAddress">เลือกที่อยู่</span>
+        </div>
+
+        <!-- QR Code -->
+        <div class="flex justify-center mb-6">
+          <img src="/images/qrcode.jpg" alt="QR Code" class="w-40 h-auto rounded-lg shadow-md">
+        </div>
+
+        <!-- ฟอร์มอัปโหลดใบเสร็จ -->
+        <form id="uploadForm" class="flex flex-col items-center">
+          <label for="imageUpload"
+            class="block bg-[#AF8F6F] text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-[#8B6E53] transition w-4/5 mx-auto font-semibold">
+            เพิ่มรูปใบเสร็จที่นี่
+            <input type="file" id="imageUpload" accept="image/*" class="hidden" required>
+          </label>
+
+          <!-- ตัวอย่างรูป -->
+          <div id="imagePreview"
+            class="hidden mt-4 flex justify-center items-center w-full max-w-xs mx-auto rounded-lg overflow-hidden">
+            <img id="previewImg" src="" alt="Preview" class="w-full rounded-lg">
+          </div>
+
+          <!-- ปุ่มยืนยัน -->
+          <button type="submit" id="submitButton"
+            class="bg-[#AF8F6F] text-white py-3 rounded-lg w-4/5 mx-auto mt-6 font-bold transition shadow-md cursor-not-allowed"
+            disabled>
+            ดำเนินการต่อ
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Script รวม Backend จาก new_payment -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // ดึงที่อยู่จาก localStorage
+        const selectedAddressText = localStorage.getItem("selectedAddress");
+        const addressDisplay = document.getElementById("selectedAddress");
+        
+        if (selectedAddressText) {
+          document.getElementById("selectedAddress").innerText = selectedAddressText;
+        } else {
+          addressDisplay.innerText = "เลือกที่อยู่";
+        }
+
+        document.getElementById("addressInput").addEventListener("click", function () {
+          window.location.href = "/select_address";
+        });
+
+        const uploadForm = document.getElementById('uploadForm');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const submitButton = document.getElementById('submitButton');
+
+        // แสดงภาพตัวอย่าง
+        imageUpload.addEventListener('change', () => {
+          const file = imageUpload.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              previewImg.src = e.target.result;
+              imagePreview.classList.remove("hidden");
+              submitButton.classList.remove("cursor-not-allowed", "bg-[#AF8F6F]");
+              submitButton.classList.add("cursor-pointer", "bg-[#543310]", "hover:bg-[#6A4525]");
+              submitButton.disabled = false;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // ฟอร์มอัปโหลด
+        uploadForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          submitButton.disabled = true;
+          submitButton.innerText = 'กำลังดำเนินการ...';
+
+          const selectedAddressId = localStorage.getItem("selectedAddressId");
+          const finalTotalPrice = localStorage.getItem("totalPrice");
+          const receiptFile = imageUpload.files[0];
+
+          if (!selectedAddressId || !finalTotalPrice || !receiptFile) {
+            alert("ข้อมูลไม่ครบถ้วน! กรุณาเลือกที่อยู่จากหน้าก่อนหน้าและอัปโหลดใบเสร็จ");
+            submitButton.disabled = false;
+            submitButton.innerText = 'ดำเนินการต่อ';
+            return;
+          }
+
+          try {
+            // ✅ สร้างคำสั่งซื้อใหม่
+            const orderResponse = await fetch('/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                address_id: parseInt(selectedAddressId),
+                total_price: parseFloat(finalTotalPrice)
+              })
+            });
+
+            const orderResult = await orderResponse.json();
+            if (!orderResult.success) throw new Error(orderResult.message || 'ไม่สามารถสร้างคำสั่งซื้อได้');
+
+            const newOrderId = orderResult.orderId;
+
+            // ✅ อัปโหลดใบเสร็จ
+            const formData = new FormData();
+            formData.append('receipt', receiptFile);
+            formData.append('order_id', newOrderId);
+
+            const uploadResponse = await fetch('/upload', { method: 'POST', body: formData });
+            const uploadResult = await uploadResponse.json();
+            if (!uploadResult.success) throw new Error(uploadResult.message || 'ไม่สามารถอัปโหลดใบเสร็จได้');
+
+            alert(`สร้างคำสั่งซื้อสำเร็จ! หมายเลขคำสั่งซื้อของคุณคือ: ${newOrderId}`);
+            localStorage.removeItem('selectedAddress');
+            localStorage.removeItem('selectedAddressId');
+            localStorage.removeItem('totalPrice');
+            window.location.href = `/show-order-user/${newOrderId}`;
+          } catch (error) {
+            console.error('เกิดข้อผิดพลาด:', error);
+            alert('เกิดข้อผิดพลาด: ' + error.message);
+            submitButton.disabled = false;
+            submitButton.innerText = 'ดำเนินการต่อ';
+          }
+        });
+      });
+    </script>
+</body>
+
+</html>

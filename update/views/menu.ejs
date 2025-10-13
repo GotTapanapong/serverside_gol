@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เมนูสินค้า | MongCha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D]">
+    <!-- Navbar -->
+    <%- include("partials/navbar_user") %>
+
+        <!-- กล่องสินค้า -->
+        <div class="grid gap-[70px] justify-items-center lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 w-full mb-4" id="box">
+        </div>
+
+        <!-- Modal รายละเอียดสินค้า -->
+        <div id="productModal"
+            class="fixed z-[1000] inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.6)] backdrop-blur-sm px-4 hidden">
+            <div class="bg-[#F8F4E1] p-5 w-full max-w-md rounded-[20px] shadow-xl text-center font-[Kanit] relative">
+                <span id="close"
+                    class="absolute top-3 right-4 text-[#543310] text-3xl font-bold cursor-pointer">&times;</span>
+                <img id="modalImage" class="mx-auto h-[160px] w-auto object-contain mb-4" src="" alt="product image" />
+                <h2 id="modalName" class="text-xl font-bold text-[#543310] mb-2"></h2>
+                <p id="modalPrice" class="text-md text-[#74512D] font-semibold mb-4"></p>
+
+                <!-- ความหวาน -->
+                <div class="mb-4">
+                    <h3 class="font-bold mb-1">ความหวาน</h3>
+                    <div class="sweetness-options">
+                        <button
+                            class="sweetness-btn m-1 px-4 py-2 bg-[#e6d7b9] rounded-full text-sm hover:scale-110">ไม่หวาน</button>
+                        <button
+                            class="sweetness-btn m-1 px-4 py-2 bg-[#e6d7b9] rounded-full text-sm hover:scale-110">หวานน้อย</button>
+                        <button
+                            class="sweetness-btn m-1 px-4 py-2 bg-[#e6d7b9] rounded-full text-sm hover:scale-110">หวานปกติ</button>
+                        <button
+                            class="sweetness-btn m-1 px-4 py-2 bg-[#e6d7b9] rounded-full text-sm hover:scale-110">หวานมาก</button>
+                    </div>
+                </div>
+
+                <!-- จำนวน -->
+                <h3>จำนวน</h3>
+                <div class="flex justify-center items-center gap-4 my-2">
+                    <button id="decreaseQuantity"
+                        class="bg-[#543310] text-white px-2 rounded-full hover:bg-[#6A4525]">-</button>
+                    <span id="quantity">1</span>
+                    <button id="increaseQuantity"
+                        class="bg-[#543310] text-white px-2 rounded-full hover:bg-[#6A4525]">+</button>
+                </div>
+
+                <!-- ปุ่มเพิ่มลงตะกร้า -->
+                <button id="addToCartBtn"
+                    class="bg-[#543310] text-white border-none px-4 py-3 w-4/5 rounded-full text-base font-bold hover:bg-[#6A4525] transition">
+                    เพิ่มลงตะกร้า
+                </button>
+            </div>
+        </div>
+
+        <!-- SCRIPT -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const modal = document.getElementById("productModal");
+                const modalImage = document.getElementById("modalImage");
+                const modalName = document.getElementById("modalName");
+                const modalPrice = document.getElementById("modalPrice");
+                const quantityEl = document.getElementById("quantity");
+                const closeBtn = document.getElementById("close");
+
+                let selectedSweetness = "";
+                let productPrice = 0;
+                let quantity = 1;
+
+                modal.style.display = "none";
+
+                document.querySelectorAll(".sweetness-btn").forEach(button => {
+                    button.addEventListener("click", () => {
+                        document.querySelectorAll(".sweetness-btn").forEach(btn => {
+                            btn.classList.remove("bg-[#543310]", "text-[#F8F4E1]", "scale-110");
+                            btn.classList.add("bg-[#e6d7b9]", "text-[#543310]");
+                        });
+                        button.classList.remove("bg-[#e6d7b9]", "text-[#543310]");
+                        button.classList.add("bg-[#543310]", "text-[#F8F4E1]", "scale-110");
+                        selectedSweetness = button.textContent.trim();
+                    });
+                });
+
+
+                // โหลดข้อมูลสินค้า
+                fetch("/get-products")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert("เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถโหลดสินค้าได้"));
+                            return;
+                        }
+
+                        const products = data.products || [];
+                        const box = document.getElementById("box");
+
+                        products.forEach(product => {
+                            const imgURL = `data:image/png;base64,${product.image_product}`;
+                            const card = document.createElement("div");
+                            card.className = "bg-[#F8F4E1] rounded-2xl shadow-sm overflow-hidden hover:scale-105 transition-transform duration-300";
+                            card.innerHTML = `
+                                <img class="h-[180px] w-[270px] p-4 object-contain mx-auto" src="${imgURL}" alt="product image" />
+                                <div class="px-5 pb-5 text-center">
+                                <b class="text-xl font-semibold text-[#543310] font-[Kanit] block">${product.product_name}</b>
+                                <div class="flex justify-center items-center mt-2">
+                                <span class="text-xl text-[#543310] font-[Kanit]">฿${product.price}</span>
+                                </div>
+                                </div>`;
+
+                            card.addEventListener("click", () => openModal(product, imgURL));
+                            box.appendChild(card);
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error loading products:", err);
+                        alert("ไม่สามารถโหลดสินค้าได้ กรุณาลองใหม่อีกครั้ง");
+                    });
+
+                function openModal(product, imgURL) {
+                    modalImage.src = imgURL;
+                    modalName.textContent = product.product_name;
+                    productPrice = product.price;
+                    quantity = 1;
+                    quantityEl.textContent = quantity;
+                    modalPrice.textContent = `฿${productPrice}`;
+                    modal.style.display = "flex";
+
+                    // รีเซ็ตความหวานทุกครั้งที่เปิด
+                    selectedSweetness = "";
+                    document.querySelectorAll(".sweetness-btn").forEach(btn => {
+                        btn.classList.remove("bg-[#543310]", "text-[#F8F4E1]", "scale-110");
+                        btn.classList.add("bg-[#e6d7b9]", "text-[#543310]");
+                    });
+
+                    // เพิ่ม / ลด จำนวน
+                    document.getElementById("increaseQuantity").onclick = () => {
+                        quantity++;
+                        quantityEl.textContent = quantity;
+                        modalPrice.textContent = `฿${productPrice * quantity}`;
+                    };
+
+                    document.getElementById("decreaseQuantity").onclick = () => {
+                        if (quantity > 1) {
+                            quantity--;
+                            quantityEl.textContent = quantity;
+                            modalPrice.textContent = `฿${productPrice * quantity}`;
+                        }
+                    };
+
+                    // เพิ่มลงตะกร้า
+                    document.getElementById("addToCartBtn").onclick = () => {
+                        const cartItem = {
+                            productName: product.product_name,
+                            price: productPrice * quantity,
+                            quantity,
+                            sweetness: selectedSweetness || "ไม่หวาน",
+                            image_product: imgURL
+                        };
+
+                        fetch("/addToCart", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(cartItem)
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert("เพิ่มลงตะกร้าสำเร็จ!");
+                                    modal.style.display = "none";
+                                    selectedSweetness = "";
+                                    quantity = 1;
+                                    quantityEl.textContent = 1;
+                                } else {
+                                    alert("เกิดข้อผิดพลาด");
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Error:", err);
+                                alert("ไม่สามารถเพิ่มลงตะกร้าได้");
+                            });
+                    };
+
+                    window.addEventListener("click", (e) => {
+                        if (e.target === modal) {
+                            modal.style.display = "none";
+                        }
+                    });
+                }
+
+            });
+        </script>
+</body>
+
+</html>

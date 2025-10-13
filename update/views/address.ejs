@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เพิ่มที่อยู่ใหม่ | MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen flex flex-col font-[Kanit]">
+  <!-- Navbar -->
+  <%- include("partials/navbar_user") %>
+
+  <!-- เนื้อหาหลัก -->
+  <main class="flex flex-col items-center justify-center flex-1">
+    <div class="bg-[#F8F4E1] w-full max-w-xl p-8 rounded-2xl shadow-xl text-center">
+      <h1 class="text-3xl font-extrabold text-[#543310] mb-6">เพิ่มที่อยู่ใหม่</h1>
+
+      <form class="insert_address flex flex-col items-center space-y-3" action="/address" method="POST">
+        <input type="hidden" id="user_id" name="user_id" value="<%= id_user %>">
+
+        <!-- ช่องทางการติดต่อ -->
+        <div class="w-full text-left">
+          <label class="text-[#543310] font-semibold">ช่องทางการติดต่อ</label>
+          <input type="text" name="full_name" placeholder="ชื่อ-นามสกุล"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+          <input type="text" name="phone_number" placeholder="หมายเลขโทรศัพท์"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-3 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+        </div>
+
+        <!-- ที่อยู่ -->
+        <div class="w-full text-left mt-4">
+          <label class="text-[#543310] font-semibold">ที่อยู่</label>
+          <input type="text" name="province" placeholder="จังหวัด"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+          <input type="text" name="district" placeholder="เขต/อำเภอ"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-3 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+          <input type="text" name="subdistrict" placeholder="แขวง/ตำบล"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-3 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+          <input type="text" name="postal_code" placeholder="รหัสไปรษณีย์"
+            class="w-full border border-[#74512D] rounded-lg p-3 mt-3 focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+            required>
+        </div>
+
+        <!-- ปุ่มเพิ่มที่อยู่ -->
+        <button type="submit"
+          class="bg-[#543310] text-[#F8F4E1] w-full py-3 rounded-full mt-5 font-bold hover:bg-[#6A4525] transition">
+          เพิ่มที่อยู่
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector(".insert_address");
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const submitButton = form.querySelector("button[type='submit']");
+        submitButton.disabled = true;
+        submitButton.innerText = "กำลังบันทึก...";
+
+        const formData = new FormData(form);
+        const formObject = Object.fromEntries(formData.entries());
+
+        // ตรวจสอบว่ากรอกครบไหม
+        for (const key in formObject) {
+          if (formObject[key].trim() === "") {
+            alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+            submitButton.disabled = false;
+            submitButton.innerText = "เพิ่มที่อยู่";
+            return;
+          }
+        }
+
+        try {
+          const res = await fetch("/address", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formObject),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert("เพิ่มที่อยู่สำเร็จ!");
+            window.location.href = "/cart";
+          } else {
+            alert("เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถเพิ่มที่อยู่ได้"));
+            submitButton.disabled = false;
+            submitButton.innerText = "เพิ่มที่อยู่";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+          submitButton.disabled = false;
+          submitButton.innerText = "เพิ่มที่อยู่";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

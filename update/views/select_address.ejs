@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เลือกที่อยู่ | MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen flex flex-col font-[Kanit]">
+  <!-- Navbar -->
+  <%- include("partials/navbar_user") %>
+
+    <!-- ส่วนเลือกที่อยู่ -->
+    <main class="flex flex-col items-center justify-start flex-1 px-6 m-4">
+      <h2 class="text-3xl font-extrabold text-[#F8F4E1] mb-4">เลือกที่อยู่</h2>
+
+      <div id="addressContainer"
+        class="bg-[#F8F4E1] w-full max-w-lg rounded-2xl shadow-xl p-5 text-center overflow-y-auto max-h-[420px] mb-6">
+        <p class="text-gray-600">กำลังโหลดที่อยู่...</p>
+      </div>
+
+      <div class="flex flex-col items-center space-y-3 w-full max-w-lg">
+        <button id="addAddressBtn" onclick="window.location.href='/address'"
+          class="w-4/5 bg-[#543310] text-[#F8F4E1] py-3 rounded-full font-bold hover:bg-[#6A4525] transition">
+          เพิ่มที่อยู่ใหม่
+        </button>
+
+        <button id="confirmAddress" disabled
+          class="w-4/5 bg-gray-400 text-white py-3 rounded-full font-bold cursor-not-allowed transition">
+          เลือกที่อยู่นี้
+        </button>
+      </div>
+    </main>
+
+    <!-- SCRIPT -->
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        const addressContainer = document.getElementById("addressContainer");
+        const confirmButton = document.getElementById("confirmAddress");
+        let selectedAddress = null;
+        let selectedAddressId = null;
+
+        try {
+          const response = await fetch("/get-user-addresses");
+          const data = await response.json();
+
+          if (response.ok && data.addresses.length > 0) {
+            addressContainer.innerHTML = "";
+            data.addresses.forEach(address => {
+              const div = document.createElement("div");
+              div.className =
+                "address-item bg-white border border-[#543310] rounded-xl p-4 mb-3 cursor-pointer transition hover:bg-[#e6d7b9]";
+              div.innerHTML = `
+          <p class="font-bold text-[#543310]">${address.full_name}</p>
+          <p class="text-gray-700">${address.phone_number}</p>
+          <p class="text-gray-600">${address.subdistrict}, ${address.district}, ${address.province}, ${address.postal_code}</p>
+        `;
+
+              div.addEventListener("click", () => {
+                // 🔹 ล้างสีทั้งหมดก่อน
+                document.querySelectorAll(".address-item").forEach(el => {
+                  el.classList.remove("bg-green-500/40");
+                  el.classList.add("bg-white", "text-[#543310]", "border-[#543310]");
+                });
+
+                // 🔹 เพิ่มสีให้กล่องที่เลือก
+                div.classList.remove("bg-white");
+                div.classList.add("bg-green-500/40", "text-[#543310]", "border-[#543310]");
+
+                // 🔹 เก็บข้อมูลไว้
+                selectedAddress = `${address.full_name}, ${address.subdistrict}, ${address.province}`;
+                selectedAddressId = address.address_id;
+
+                // 🔹 เปิดปุ่ม "เลือกที่อยู่นี้"
+                confirmButton.disabled = false;
+                confirmButton.classList.remove("bg-gray-400", "cursor-not-allowed");
+                confirmButton.classList.add("bg-green-600", "hover:bg-green-700");
+              });
+
+              addressContainer.appendChild(div);
+            });
+          } else {
+            addressContainer.innerHTML = "<p class='text-gray-600'>ยังไม่มีที่อยู่ที่บันทึกไว้</p>";
+          }
+        } catch (error) {
+          console.error("Error fetching addresses:", error);
+          addressContainer.innerHTML = "<p class='text-red-500'>เกิดข้อผิดพลาดในการโหลดที่อยู่</p>";
+        }
+
+        confirmButton.addEventListener("click", () => {
+          if (selectedAddress && selectedAddressId) {
+            localStorage.setItem("selectedAddress", selectedAddress);
+            localStorage.setItem("selectedAddressId", selectedAddressId);
+            window.location.href = "/payment";
+          }
+        });
+      });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดคำสั่งซื้อ #<%= order.order_id %> | MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen flex flex-col font-[Kanit]">
+  <!-- Navbar -->
+  <%- include("partials/navbar_seller") %>
+
+    <!-- เนื้อหาหลัก -->
+    <main class="flex flex-col items-center justify-start flex-1 mb-4 mx-4">
+      <div class="bg-[#F8F4E1] w-full p-8 rounded-2xl shadow-xl text-center">
+        <h1 class="text-3xl font-extrabold text-[#543310] mb-4">
+          รายละเอียดคำสั่งซื้อ #<%= order.order_id %>
+        </h1>
+
+        <div class="bg-[#e6d7b9] rounded-xl p-4 mb-6 shadow-sm text-left">
+          <p class="text-[#543310] font-semibold mb-1">
+            สถานะ :
+            <span class="
+              <% if (order.status === 'pending') { %> text-yellow-600
+              <% } else if (order.status === 'processing') { %> text-blue-600
+              <% } else if (order.status === 'completed') { %> text-green-600
+              <% } else { %> text-gray-600 <% } %> font-bold">
+              <% if (order.status==='pending' ) { %> รอดำเนินการ
+              <% } else if (order.status==='processing' ) { %> กำลังเตรียม
+              <% } else if (order.status==='completed' ) { %> สำเร็จ
+              <% } else { %> ไม่ทราบสถานะ
+              <% } %>
+
+            </span>
+          </p>
+
+          <p class="text-[#543310]">ยอดรวม : ฿<%= order.total_price.toFixed(2) %>
+          </p>
+          <p class="text-[#543310]">
+            วันที่สั่งซื้อ :
+            <%= new Date(order.datetime).toLocaleString('th-TH', { dateStyle: 'medium' , timeStyle: 'short' }) %>
+          </p>
+        </div>
+
+        <!-- ที่อยู่จัดส่ง -->
+        <div class="bg-white rounded-xl border border-[#543310] p-5 mb-5 text-left shadow-sm">
+          <h2 class="text-xl font-bold text-[#543310] border-b border-[#e6d7b9] pb-2 mb-3">ที่อยู่สำหรับจัดส่ง</h2>
+          <p><span class="font-bold">ชื่อผู้รับ : </span>
+            <%= order.recipient_name %>
+          </p>
+          <p><span class="font-bold">เบอร์โทรศัพท์ : </span>
+            <%= order.recipient_phone %>
+          </p>
+          <p><span class="font-bold">ที่อยู่ : </span>
+            <%= order.subdistrict %>, <%= order.district %>, <%= order.province %>
+                  <%= order.postal_code %>
+          </p>
+        </div>
+
+        <!-- ข้อมูลผู้สั่งซื้อ -->
+        <div class="bg-white rounded-xl border border-[#543310] p-5 mb-5 text-left shadow-sm">
+          <h2 class="text-xl font-bold text-[#543310] border-b border-[#e6d7b9] pb-2 mb-3">ข้อมูลผู้สั่งซื้อ</h2>
+          <p><span class="font-bold">ชื่อ : </span>
+            <%= order.customer_name %>
+          </p>
+          <p><span class="font-bold">เบอร์โทรศัพท์ : </span>
+            <%= order.customer_phone %>
+          </p>
+        </div>
+
+        <!-- รายการสินค้า -->
+        <div class="bg-white rounded-xl border border-[#543310] p-5 shadow-sm overflow-x-auto">
+          <h2 class="text-xl font-bold text-[#543310] pb-2 mb-3">รายการสินค้า</h2>
+          <table class="w-full text-center border border-[#543310] rounded-lg">
+            <thead>
+              <tr class="bg-[#e6d7b9] text-[#543310]">
+                <th class="py-2 px-4 border">สินค้า</th>
+                <th class="py-2 px-4 border">จำนวน</th>
+                <th class="py-2 px-4 border">ระดับความหวาน</th>
+                <th class="py-2 px-4 border">ราคา</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (items && items.length> 0) { %>
+                <% items.forEach(item=> { %>
+                  <tr class="hover:bg-[#f3ead6] transition">
+                    <td class="py-2 border">
+                      <%= item.product_name %>
+                    </td>
+                    <td class="py-2 border">
+                      <%= item.quantity %>
+                    </td>
+                    <td class="py-2 border">
+                      <%= item.sweetness_level %>
+                    </td>
+                    <td class="py-2 border text-[#543310] font-bold">฿<%= item.price.toFixed(2) %>
+                    </td>
+                  </tr>
+                  <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="4" class="py-4 text-gray-500">ไม่มีรายการสินค้า</td>
+                      </tr>
+                      <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ปุ่มกลับ -->
+        <div class="mt-8">
+          <a href="/order_seller"
+            class="inline-block bg-[#543310] text-[#F8F4E1] px-6 py-3 rounded-full font-bold hover:bg-[#6A4525] transition">กลับไปหน้ารายการ
+          </a>
+        </div>
+      </div>
+    </main>
+
+</body>
+
+</html>

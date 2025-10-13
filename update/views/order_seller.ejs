@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จัดการคำสั่งซื้อ | MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-[#74512D] min-h-screen font-[Kanit] flex flex-col">
+  <!-- Navbar -->
+  <%- include("partials/navbar_seller") %>
+
+    <!-- เนื้อหาหลัก -->
+    <main class="flex flex-col items-center justify-start flex-1 mb-4 mx-4">
+      <div class="bg-[#F8F4E1] w-full max-w-5xl p-8 rounded-2xl shadow-xl text-center">
+        <h1 class="text-3xl font-extrabold text-[#543310] mb-6">จัดการคำสั่งซื้อ</h1>
+
+        <% if (orders && orders.length> 0) { %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-[#543310] rounded-lg text-[#543310] text-center">
+              <thead>
+                <tr class="bg-[#e6d7b9]">
+                  <th class="py-2 px-4 border">หมายเลขคำสั่งซื้อ</th>
+                  <th class="py-2 px-4 border">วันเวลา</th>
+                  <th class="py-2 px-4 border">ราคา</th>
+                  <th class="py-2 px-4 border">รายละเอียด</th>
+                  <th class="py-2 px-4 border">สถานะปัจจุบัน</th>
+                  <th class="py-2 px-4 border">อัปเดตสถานะ</th>
+                  <th class="py-2 px-4 border">ลบคำสั่งซื้อ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% orders.forEach(order=> { %>
+                  <tr class="hover:bg-[#f3ead6] transition">
+                    <td class="py-2 border font-semibold">หมายเลขสั่งซื้อ <%= order.order_id %>
+                    </td>
+                    <td class="py-2 border">
+                      <%= new Date(order.datetime).toLocaleString('th-TH') %>
+                    </td>
+                    <td class="py-2 border font-bold">฿<%= order.total_price.toFixed(2) %>
+                    </td>
+
+                    <td class="py-2 border align-middle">
+                      <button onclick="viewDetails('<%= order.order_id %>')"
+                        class="bg-[#8B5E3B] text-white px-4 py-1 rounded-full hover:bg-[#6A4525] transition flex items-center justify-center mx-auto">
+
+                        <!-- ข้อความเมื่อจอใหญ่ -->
+                        <span class="hidden lg:inline">ดูรายละเอียด</span>
+                        <!-- ข้อความเมื่อจอเล็ก -->
+                        <span class="inline lg:hidden">ดู</span>
+                      </button>
+                    </td>
+
+
+                    <td class="py-2 border font-semibold">
+                      <% if (order.status==='pending' ) { %>
+                        <span class="text-yellow-600">รอดำเนินการ</span>
+                        <% } else if (order.status==='processing' ) { %>
+                          <span class="text-blue-600">กำลังเตรียม</span>
+                          <% } else if (order.status==='completed' ) { %>
+                            <span class="text-green-500">สำเร็จ</span>
+                            <% } else { %>
+                              <span class="text-gray-600">
+                                <%= order.status %>
+                              </span>
+                              <% } %>
+                    </td>
+
+                    <td class="py-2 border">
+                      <form class="flex flex-col items-center gap-2 md:flex-row justify-center"
+                        action="/order/<%= order.order_id %>/update-status" method="POST">
+                        <select name="status"
+                          class="border border-[#543310] rounded-lg p-1 text-sm bg-[#F8F4E1] focus:ring-2 focus:ring-[#AF8F6F]">
+                          <option value="pending" <%=order.status==='pending' ? 'selected' : '' %>>รอดำเนินการ</option>
+                          <option value="processing" <%=order.status==='processing' ? 'selected' : '' %>>กำลังเตรียม
+                          </option>
+                          <option value="completed" <%=order.status==='completed' ? 'selected' : '' %>>สำเร็จ</option>
+                        </select>
+                        <button type="submit"
+                          class="bg-[#543310] text-white px-3 py-1 rounded-full text-sm hover:bg-[#6A4525] transition">
+                          อัปเดต
+                        </button>
+                      </form>
+                    </td>
+
+                    <td class="py-2 border">
+                      <form action="/order/<%= order.order_id %>/delete" method="POST"
+                        onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบออเดอร์นี้? ข้อมูลทั้งหมดจะถูกลบอย่างถาวร');">
+                        <button type="submit"
+                          class="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full font-semibold transition">
+                          ลบ
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+            <p class="text-gray-600 mt-6">ไม่พบคำสั่งซื้อ</p>
+            <% } %>
+      </div>
+    </main>
+
+    <!-- SCRIPT -->
+    <script>
+      function viewDetails(orderId) {
+        window.location.href = `/show_order_seller/${orderId}`;
+      }
+    </script>
+</body>
+
+</html>

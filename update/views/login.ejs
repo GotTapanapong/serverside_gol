@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตะกร้าสินค้า</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+
+<body>
+    <div class="content">
+        <form id="login-form" action="/login" method="post">
+            <img class="showlogo" src="/images/logo.png" alt="">
+
+            <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้" required>
+            <input type="password" id="password" name="password" placeholder="รหัสผ่าน" required><br>
+
+            <button class="loginuser" type="submit">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="registime">
+            <p>ยังไม่มีบัญชีใช่ไหม</p>
+            <button onclick="goregispage('/register')" class="regis">ลงชื่อสมัคร</button>
+        </div>
+
+       
+
+    <script>
+        // ฟังก์ชันสำหรับการเปลี่ยนหน้าไปยังหน้าสมัครสมาชิก
+function goregispage(url) {
+    window.location.href = url;
+}
+
+// // การตรวจสอบการตอบกลับจากเซิร์ฟเวอร์หลังจากการส่งฟอร์ม
+// const loginForm = document.getElementById("login-form");
+// loginForm.addEventListener("submit", function (event) {
+//     event.preventDefault(); // ป้องกันการส่งฟอร์ม
+
+//     const username = document.getElementById("username").value;
+//     const password = document.getElementById("password").value;
+
+//     // ตรวจสอบว่าผู้ใช้กรอกข้อมูลครบถ้วนหรือไม่
+//     if (!username || !password) {
+//         alert("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน");
+//         return;
+//     }
+
+//     // ส่งข้อมูลเข้าสู่เซิร์ฟเวอร์
+//     fetch("/login", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json" // ระบุประเภทข้อมูลเป็น JSON
+//         },
+//         body: JSON.stringify({ username, password }) // แปลงข้อมูลเป็น JSON
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             // ถ้าไม่ใช่ HTTP 200
+//             throw new Error('Network response was not ok');
+//         }
+//         return response.json(); // แปลงการตอบกลับจากเซิร์ฟเวอร์เป็น JSON
+//     })
+//     .then(data => {
+//         if (data.success) {
+//             // ถ้าการล็อกอินสำเร็จ
+//             window.location.href = "/address"; // เปลี่ยนไปที่หน้า address หรือหน้าที่ต้องการ
+//         } else {
+//             // ถ้าไม่สำเร็จ แสดงข้อความแจ้งเตือน
+//             document.getElementById("login-error-message").style.display = "block";
+//         }
+//     })
+//     .catch(error => {
+//         console.error("Error:", error);
+//         alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+//     });
+// });
+
+    </script>
+
+</body>
+
+</html>
