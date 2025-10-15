@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,94 +13,75 @@
   <!-- Navbar -->
   <%- include("partials/navbar_seller") %>
 
-  <!-- เนื้อหาหลัก -->
-  <main class="flex flex-col flex-1 items-center justify-start mb-4">
-    <div class="bg-[#F8F4E1] w-full max-w-5xl rounded-2xl shadow-xl p-8 text-center">
-      <h1 class="text-3xl font-extrabold text-[#543310] mb-6">จัดการเมนู</h1>
+    <!-- เนื้อหาหลัก -->
+    <main class="flex flex-col flex-1 items-center justify-start mb-4">
+      <div class="bg-[#F8F4E1] w-full max-w-5xl rounded-2xl shadow-xl p-8 text-center">
+        <h1 class="text-3xl font-extrabold text-[#543310] mb-6">จัดการเมนู</h1>
 
-      <!-- ฟอร์มเพิ่มสินค้า -->
-      <form id="add-product-form" class="space-y-4 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input id="product_name" type="text" placeholder="ชื่อสินค้า"
-            class="p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
-            required>
+        <!-- ฟอร์มเพิ่มสินค้า -->
+        <form id="add-product-form" enctype="multipart/form-data" class="space-y-4 mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input id="product_name" type="text" placeholder="ชื่อสินค้า"
+              class="p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] text-[#74512D] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+              required>
 
-          <input id="price" type="number" step="0.01" placeholder="ราคา"
-            class="p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
-            required>
-        </div>
+            <input id="price" type="number" step="0.01" placeholder="ราคา"
+              class="p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] text-[#74512D] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+              required>
 
-        <input id="description" type="text" placeholder="รายละเอียดสินค้า"
-          class="w-full p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
-          required>
+            <input id="description" type="text" placeholder="รายละเอียดสินค้า"
+              class="w-full p-3 rounded-lg border border-[#74512D] bg-[#F2E3C6] text-[#74512D] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]"
+              required>
 
-        <!-- ปุ่มอัปโหลดรูป -->
-        <div class="flex flex-col items-center">
-          <label for="image_product" id="uploadLabel"
-            class="block bg-[#AF8F6F] text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-[#8B6E53] transition w-4/5 mx-auto">
-            เพิ่มรูปภาพสินค้า
-            <input type="file" id="image_product" accept="image/*" class="hidden" required>
-          </label>
+            <input type="file" id="image_product" accept="image/*"
+              class="block bg-[#AF8F6F] text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-[#8B6E53] transition w-4/5 mx-auto"
+              required>
+          </div>
 
           <button type="submit"
             class="mt-6 bg-green-300 hover:bg-green-400 text-[#543310] px-8 py-3 rounded-full transition">
             เพิ่มสินค้า
           </button>
+        </form>
+
+        <!-- ตารางสินค้า -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-[#543310] rounded-lg text-[#543310] text-center">
+            <thead>
+              <tr class="bg-[#e6d7b9]">
+                <th class="py-2 px-4 border">ID</th>
+                <th class="py-2 px-4 border">ชื่อสินค้า</th>
+                <th class="py-2 px-4 border">ราคา</th>
+                <th class="py-2 px-4 border">รายละเอียด</th>
+                <th class="py-2 px-4 border">รูปภาพ</th>
+                <th class="py-2 px-4 border"></th>
+              </tr>
+            </thead>
+            <tbody id="product-table-body" class="bg-white">
+            </tbody>
+          </table>
         </div>
-      </form>
-
-      <!-- ตารางสินค้า -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full border border-[#543310] rounded-lg text-[#543310] text-center">
-          <thead>
-            <tr class="bg-[#e6d7b9]">
-              <th class="py-2 px-4 border">ID</th>
-              <th class="py-2 px-4 border">ชื่อสินค้า</th>
-              <th class="py-2 px-4 border">ราคา</th>
-              <th class="py-2 px-4 border">รายละเอียด</th>
-              <th class="py-2 px-4 border">รูปภาพ</th>
-              <th class="py-2 px-4 border"></th>
-            </tr>
-          </thead>
-          <tbody id="product-table-body" class="bg-white">
-            <tr><td colspan="6" class="py-4 text-gray-500">กำลังโหลดข้อมูล...</td></tr>
-          </tbody>
-        </table>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <!-- SCRIPT -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const addForm = document.getElementById("add-product-form");
-      const productTableBody = document.getElementById("product-table-body");
-      const imageInput = document.getElementById("image_product");
-      const uploadLabel = document.getElementById("uploadLabel");
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const addForm = document.getElementById("add-product-form");
+        const productTableBody = document.getElementById("product-table-body");
 
-      // เปลี่ยนข้อความปุ่มเป็นชื่อไฟล์
-      imageInput.addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-          uploadLabel.textContent = `${file.name}`;
-        } else {
-          uploadLabel.textContent = "เพิ่มรูปภาพสินค้า";
-        }
-      });
+        // ดึงข้อมูลสินค้า
+        async function fetchProducts() {
+          try {
+            const res = await fetch("/get-products");
+            const data = await res.json();
 
-      // ดึงข้อมูลสินค้า
-      async function fetchProducts() {
-        try {
-          const res = await fetch("/get-products");
-          const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+            productTableBody.innerHTML = "";
 
-          if (!data.success) throw new Error(data.message);
-          productTableBody.innerHTML = "";
-
-          data.products.forEach((product) => {
-            const row = document.createElement("tr");
-            row.className = "hover:bg-[#f3ead6] transition";
-            row.innerHTML = `
+            data.products.forEach((product) => {
+              const row = document.createElement("tr");
+              row.className = "hover:bg-[#f3ead6] transition";
+              row.innerHTML = `
               <td class="border py-2">${product.product_id}</td>
               <td class="border py-2">${product.product_name}</td>
               <td class="border py-2">฿${product.price}</td>
@@ -113,64 +95,64 @@
                   ลบ
                 </button>
               </td>`;
-            productTableBody.appendChild(row);
-          });
-        } catch (err) {
-          console.error("Error fetching products:", err);
-          productTableBody.innerHTML = `<tr><td colspan="6" class="py-4 text-red-500">ไม่สามารถโหลดข้อมูลได้</td></tr>`;
-        }
-      }
-
-      // เพิ่มสินค้า
-      addForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("product_name", document.getElementById("product_name").value);
-        formData.append("price", document.getElementById("price").value);
-        formData.append("description", document.getElementById("description").value);
-        formData.append("image_product", document.getElementById("image_product").files[0]);
-
-        try {
-          const res = await fetch("/add-product", { method: "POST", body: formData });
-          const data = await res.json();
-          if (data.success) {
-            alert("เพิ่มสินค้าเรียบร้อยแล้ว");
-            addForm.reset();
-            uploadLabel.textContent = "เพิ่มรูปภาพสินค้า";
-            fetchProducts();
-          } else {
-            alert("เกิดข้อผิดพลาด: " + data.message);
+              productTableBody.appendChild(row);
+            });
+          } catch (err) {
+            console.error("Error fetching products:", err);
+            productTableBody.innerHTML = `<tr><td colspan="6" class="py-4 text-red-500">ไม่สามารถโหลดข้อมูลได้</td></tr>`;
           }
-        } catch (err) {
-          console.error("Error adding product:", err);
-          alert("ไม่สามารถเพิ่มสินค้าได้");
         }
-      });
 
-      // ลบสินค้า
-      productTableBody.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("delete-btn")) {
-          const id = e.target.dataset.id;
-          if (confirm(`ต้องการลบสินค้า ID: ${id} ใช่ไหม?`)) {
-            try {
-              const res = await fetch(`/delete-product/${id}`, { method: "DELETE" });
-              const data = await res.json();
-              if (res.ok) {
-                alert(data.message);
-                fetchProducts();
-              } else {
-                alert("เกิดข้อผิดพลาด: " + data.error);
+        // เพิ่มสินค้า
+        addForm.addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          const formData = new FormData();
+          formData.append('product_name', document.getElementById('product_name').value);
+          formData.append('price', document.getElementById('price').value);
+          formData.append('description', document.getElementById('description').value);
+          formData.append('image_product', document.getElementById('image_product').files[0]);
+
+          try {
+            const response = await fetch('/add-product', { method: 'POST', body: formData });
+            const result = await response.json();
+            if (result.success) {
+              alert(result.message);
+              addForm.reset();
+              fetchProducts();
+            } else {
+              throw new Error(result.message);
+            }
+          } catch (error) {
+            alert('เกิดข้อผิดพลาด: ' + error.message);
+          }
+        });
+
+
+        // ลบสินค้า
+        productTableBody.addEventListener('click', async function (event) {
+          if (event.target.classList.contains('btn-delete')) {
+            const productId = event.target.dataset.id;
+            if (confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบสินค้า ID: ${productId}?`)) {
+              try {
+                const response = await fetch(`/delete-product/${productId}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (response.ok) {
+                  alert(result.message);
+                  fetchProducts();
+                } else {
+                  throw new Error(result.error);
+                }
+              } catch (error) {
+                alert('เกิดข้อผิดพลาด: ' + error.message);
               }
-            } catch (err) {
-              console.error("Error deleting product:", err);
-              alert("ไม่สามารถลบสินค้าได้");
             }
           }
-        }
-      });
+        });
 
-      fetchProducts();
-    });
-  </script>
+        fetchProducts();
+      });
+    </script>
 </body>
+
 </html>

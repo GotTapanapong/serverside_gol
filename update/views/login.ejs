@@ -1,83 +1,63 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตะกร้าสินค้า</title>
-    <link rel="stylesheet" href="/css/login.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MongCha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <div class="content">
-        <form id="login-form" action="/login" method="post">
-            <img class="showlogo" src="/images/logo.png" alt="">
+<body class="bg-[#74512D] min-h-screen flex items-center justify-center font-[Kanit]">
+  <main class="p-8 w-full max-w-md text-center">
+    <!-- โลโก้ -->
+    <img src="/images/logo.png" alt="MongCha Logo" class="mx-auto w-48 mb-6">
 
-            <input type="text" id="username" name="username" placeholder="ชื่อผู้ใช้" required>
-            <input type="password" id="password" name="password" placeholder="รหัสผ่าน" required><br>
+    <!-- ฟอร์มเข้าสู่ระบบ -->
+    <form id="login-form" action="/login" method="POST" class="flex flex-col gap-4">
+      <input 
+        type="text" 
+        id="username" 
+        name="username" 
+        placeholder="ชื่อผู้ใช้" 
+        required
+        class="w-full p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] text-[#543310] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F]  shadow-md"
+      >
+      
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="รหัสผ่าน" 
+        required
+        class="w-full p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] text-[#543310] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] shadow-md"
+      >
 
-            <button class="loginuser" type="submit">เข้าสู่ระบบ</button>
-        </form>
+      <button 
+        type="submit"
+        class="w-full bg-[#543310] text-[#F8F4E1] py-3 rounded-full hover:bg-[#6A4525] transition"
+      >
+        เข้าสู่ระบบ
+      </button>
+    </form>
 
-        <div class="registime">
-            <p>ยังไม่มีบัญชีใช่ไหม</p>
-            <button onclick="goregispage('/register')" class="regis">ลงชื่อสมัคร</button>
-        </div>
+    <!-- ลิงก์สมัครสมาชิก -->
+    <div class="mt-6 text-[#AF8F6F] flex justify-center gap-2">
+      <p>ยังไม่มีบัญชีใช่ไหม?</p>
+      <button 
+        onclick="goregispage('/register')" 
+        class="text-[#F8F4E1] hover:underline"
+      >
+        ลงชื่อสมัคร
+      </button>
+    </div>
+  </main>
 
-       
-
-    <script>
-        // ฟังก์ชันสำหรับการเปลี่ยนหน้าไปยังหน้าสมัครสมาชิก
-function goregispage(url) {
-    window.location.href = url;
-}
-
-// // การตรวจสอบการตอบกลับจากเซิร์ฟเวอร์หลังจากการส่งฟอร์ม
-// const loginForm = document.getElementById("login-form");
-// loginForm.addEventListener("submit", function (event) {
-//     event.preventDefault(); // ป้องกันการส่งฟอร์ม
-
-//     const username = document.getElementById("username").value;
-//     const password = document.getElementById("password").value;
-
-//     // ตรวจสอบว่าผู้ใช้กรอกข้อมูลครบถ้วนหรือไม่
-//     if (!username || !password) {
-//         alert("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน");
-//         return;
-//     }
-
-//     // ส่งข้อมูลเข้าสู่เซิร์ฟเวอร์
-//     fetch("/login", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json" // ระบุประเภทข้อมูลเป็น JSON
-//         },
-//         body: JSON.stringify({ username, password }) // แปลงข้อมูลเป็น JSON
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             // ถ้าไม่ใช่ HTTP 200
-//             throw new Error('Network response was not ok');
-//         }
-//         return response.json(); // แปลงการตอบกลับจากเซิร์ฟเวอร์เป็น JSON
-//     })
-//     .then(data => {
-//         if (data.success) {
-//             // ถ้าการล็อกอินสำเร็จ
-//             window.location.href = "/address"; // เปลี่ยนไปที่หน้า address หรือหน้าที่ต้องการ
-//         } else {
-//             // ถ้าไม่สำเร็จ แสดงข้อความแจ้งเตือน
-//             document.getElementById("login-error-message").style.display = "block";
-//         }
-//     })
-//     .catch(error => {
-//         console.error("Error:", error);
-//         alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
-//     });
-// });
-
-    </script>
-
+  <script>
+    // ฟังก์ชันไปหน้าสมัครสมาชิก
+    function goregispage(url) {
+      window.location.href = url;
+    }
+  </script>
 </body>
-
 </html>

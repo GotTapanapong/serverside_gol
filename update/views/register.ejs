@@ -5,58 +5,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตะกร้าสินค้า</title>
-    <link rel="stylesheet" href="/css/register.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-[#74512D] min-h-screen flex flex-col items-center justify-center font-[Kanit]">
+    
+    <img class="w-48" src="/images/logo.png" alt="">
 
-    <body>
-        <!-- <div class="navbar-header">
-            <img src="/images/logo.png" alt="MONGCHA Logo" class="navbar-brand">
-            <button id="menu-toggle" class="menu-toggle">☰</button>
-            <script src="/js/script.js"></script>
-        </div> -->
-        <div class="content">
-        <form action="/register" method="POST">
-            <img class="showlogo" src="/images/logo.png" alt="">
+    <div class="p-8 w-full max-w-md text-center justify-center items-center">
+        <form action="/register" method="POST" class="flex flex-col gap-4">
 
-            <input type="firstname" name="firstname" placeholder="ชื่อ" required>
-            <input type="surname" name="surname" placeholder="นามสกุล" required>
-            <input type="phone_num" name="phone_num" placeholder="เบอร์โทรศัพท์" required>
-            <input type="username" name="username" placeholder="ชื่อผู้ใช้" required>
-            <input type="password" name="password" placeholder="รหัสผ่าน" required><br>
-
-            <button class="loginuser" type="submit">สมัคร</button>
+            <input type="firstname" name="firstname" placeholder="ชื่อ" required
+                class="p-3 rounded-lg border border-[#AF8F6F] text-[#74512D] bg-[#F8F4E1] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] text-[#543310]">
+            <input type="surname" name="surname" placeholder="นามสกุล" required
+                class="p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] text-[#543310]">
+            <input type="phone_num" name="phone_num" placeholder="เบอร์โทรศัพท์" required
+                class="p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] text-[#543310]">
+            <input type="username" name="username" placeholder="ชื่อผู้ใช้" required
+                class="p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] text-[#543310]">
+            <input type="password" name="password" placeholder="รหัสผ่าน" required
+                class="p-3 rounded-lg border border-[#AF8F6F] bg-[#F8F4E1] placeholder-[#AF8F6F] focus:outline-none focus:ring-2 focus:ring-[#AF8F6F] text-[#543310]">
+            <button class="bg-[#543310] text-[#F8F4E1] py-3 rounded-full hover:bg-[#6A4525] transition"
+                type="submit">สมัคร</button>
         </form>
-        <div class="registime">
-            <p>มีบัญชีใช่ไหม</p>
-            <button onclick="goregispage('/login')" class="regis">ลงชื่อเข้าใช้</button>
+        <div class="mt-6 text-[#AF8F6F] flex justify-center gap-2">
+            <p>มีบัญชีใช่ไหม?</p>
+            <button onclick="goregispage('/login')"
+                class="text-[#F8F4E1] font-bold hover:underline">ลงชื่อเข้าใช้</button>
         </div>
-        </div>
-        <script>
-            function goregispage(url) {
-                window.location.href = url;
-            }
+    </div>
+    <script>
+        function goregispage(url) {
+            window.location.href = url;
+        }
 
 
-            function submitForm() {
-                const form = document.getElementById("userForm");
-                const formData = new FormData(form);
+        function submitForm() {
+            const form = document.getElementById("userForm");
+            const formData = new FormData(form);
 
-                fetch("/regis-form", {
-                    method: "POST",
-                    body: formData
+            fetch("/regis-form", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Form submitted successfully!");
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert("Form submitted successfully!");
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
-            }
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
 
-        </script>
-    </body>
+    </script>
+</body>
 
 </html>

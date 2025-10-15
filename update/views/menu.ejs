@@ -14,7 +14,8 @@
     <%- include("partials/navbar_user") %>
 
         <!-- กล่องสินค้า -->
-        <div class="grid gap-[70px] justify-items-center lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 w-full mb-4" id="box">
+        <div class="grid gap-[70px] justify-items-center lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 w-full mb-4"
+            id="box">
         </div>
 
         <!-- Modal รายละเอียดสินค้า -->
@@ -192,6 +193,11 @@
                             modal.style.display = "none";
                         }
                     });
+                    
+                    closeBtn.onclick = () => {
+                        modal.style.display = "none";
+                    };
+
                 }
 
             });
