@@ -76,7 +76,7 @@
           total += itemTotalPrice;
 
           row.innerHTML = `
-            <td class='border py-2'><img src="data:image/png;base64,${item.image_product}" 
+            <td class='border py-2'><img src="{item.image_product}" 
               alt="${item.productName}" class='w-20 h-auto rounded-lg mx-auto'></td>
             <td class='border py-2'>${item.productName}</td>
             <td class='border py-2 text-[#543310] font-bold'>฿${item.price.toFixed(2)}</td>
