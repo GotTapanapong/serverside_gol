@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MongCha</title>
+  <title>MongCha | รายละเอียดคำสั่งซื้อ</title>
   <link rel="icon" type="image/png" href="/images/logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
@@ -14,87 +14,96 @@
   <!-- Navbar -->
   <%- include("partials/navbar_user") %>
 
-    <!-- ส่วนเนื้อหาหลัก -->
-    <main class="flex justify-center items-center flex-1 px-6">
-      <div class="bg-[#F8F4E1] p-8 rounded-2xl shadow-xl w-full max-w-4xl text-center">
+  <!-- ส่วนเนื้อหาหลัก -->
+  <main class="flex justify-center items-center flex-1 px-6">
+    <div class="bg-[#F8F4E1] p-8 rounded-2xl shadow-xl w-full max-w-4xl text-center">
 
-        <h2 class="text-3xl font-extrabold text-[#543310] mb-6">รายละเอียดคำสั่งซื้อ</h2>
+      <h2 class="text-3xl font-extrabold text-[#543310] mb-6">รายละเอียดคำสั่งซื้อ</h2>
 
-        <% if (order) { %>
-          <div class="mb-6 p-4 bg-[#e6d7b9] rounded-lg shadow-sm">
-            <h3 class="font-bold text-[#543310]">
-              สถานะล่าสุด:
-              <span class="
-                <% if (order.status === 'pending') { %> text-yellow-600
-                <% } else if (order.status === 'processing') { %> text-blue-600
-                <% } else if (order.status === 'completed') { %> text-green-600
-                <% } else { %> text-gray-600 <% } %> font-bold">
-                <% if (order.status==='pending' ) { %>
-                  รอดำเนินการ
-                  <% } else if (order.status==='processing' ) { %>
-                    กำลังเตรียม
-                    <% } else if (order.status==='completed' ) { %>
-                      สำเร็จ
-                      <% } else { %>
-                        <%= order.status %>
-                          <% } %>
-              </span>
-            </h3>
+      <% if (order) { %>
+        <div class="mb-6 p-4 bg-[#e6d7b9] rounded-lg shadow-sm">
+          <h3 class="font-bold text-[#543310]">
+            สถานะล่าสุด:
+            <span class="
+              <% if (order.status === 'pending') { %> text-yellow-600
+              <% } else if (order.status === 'processing') { %> text-blue-600
+              <% } else if (order.status === 'completed') { %> text-green-600
+              <% } else { %> text-gray-600 <% } %> font-bold">
+              <% if (order.status === 'pending') { %>
+                รอดำเนินการ
+              <% } else if (order.status === 'processing') { %>
+                กำลังเตรียม
+              <% } else if (order.status === 'completed') { %>
+                สำเร็จ
+              <% } else { %>
+                <%= order.status %>
+              <% } %>
+            </span>
+          </h3>
+        </div>
+      <% } %>
 
-          </div>
-          <% } %>
-
-            <!-- ตารางรายละเอียดสินค้าในออเดอร์ -->
-            <div class="overflow-x-auto">
-              <table class="w-full border border-gray-300 rounded-lg">
-                <thead>
-                  <tr class="bg-[#e6d7b9] text-[#543310]">
-                    <th class="py-2 px-4 border">คำสั่งซื้อ</th>
-                    <th class="py-2 px-4 border">ชื่อสินค้า</th>
-                    <th class="py-2 px-4 border">จำนวน</th>
-                    <th class="py-2 px-4 border">ราคา</th>
-                    <th class="py-2 px-4 border">ระดับความหวาน</th>
-                  </tr>
-                </thead>
-                <tbody class="text-gray-700">
-                  <% if (order_items && order_items.length> 0) { %>
-                    <% order_items.forEach(item=> { %>
-                      <tr class="hover:bg-[#f3ead6] transition">
-                        <td class="py-2 border">
-                          <%= item.order_id %>
-                        </td>
-                        <td class="py-2 border">
-                          <%= item.product_name %>
-                        </td>
-                        <td class="py-2 border">
-                          <%= item.quantity %>
-                        </td>
-                        <td class="py-2 border text-[#543310] font-bold">฿<%= item.price.toFixed(2) %>
-                        </td>
-                        <td class="py-2 border">
-                          <%= item.sweetness_level %>
-                        </td>
-                      </tr>
-                      <% }) %>
-                        <% } else { %>
-                          <tr>
-                            <td colspan="5" class="py-4 text-gray-500">ไม่พบข้อมูลคำสั่งซื้อ</td>
-                          </tr>
-                          <% } %>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- ปุ่มกลับ -->
-            <div class="mt-8">
-              <a href="/orders"
-                class="inline-block bg-[#543310] text-[#F8F4E1] px-6 py-3 rounded-full font-bold hover:bg-[#6A4525] transition">
-                กลับไปหน้าคำสั่งซื้อ
-              </a>
-            </div>
+      <!-- ตารางรายละเอียดสินค้าในออเดอร์ -->
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-300 rounded-lg" id="order-table">
+          <thead>
+            <tr class="bg-[#e6d7b9] text-[#543310]">
+              <th class="py-2 px-4 border">คำสั่งซื้อ</th>
+              <th class="py-2 px-4 border">ชื่อสินค้า</th>
+              <th class="py-2 px-4 border">จำนวน</th>
+              <th class="py-2 px-4 border">ราคาต่อหน่วย</th>
+              <th class="py-2 px-4 border">ราคารวม</th>
+              <th class="py-2 px-4 border">ระดับความหวาน</th>
+            </tr>
+          </thead>
+          <tbody id="order-items" class="text-gray-700">
+            <% if (order_items && order_items.length > 0) { %>
+              <% order_items.forEach(item => { %>
+                <tr class="hover:bg-[#f3ead6] transition">
+                  <td class="py-2 border"><%= item.order_id %></td>
+                  <td class="py-2 border"><%= item.product_name %></td>
+                  <td class="py-2 border qty"><%= item.quantity %></td>
+                  <td class="py-2 border price text-[#543310] font-semibold">฿<%= item.price.toFixed(2) %></td>
+                  <td class="py-2 border subtotal text-[#543310] font-bold">฿<%= (item.price * item.quantity).toFixed(2) %></td>
+                  <td class="py-2 border"><%= item.sweetness_level %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" class="py-4 text-gray-500">ไม่พบข้อมูลคำสั่งซื้อ</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
       </div>
-    </main>
 
+      <!-- รวมทั้งหมด -->
+      <div class="mt-6 flex justify-center items-center text-lg text-[#543310] space-x-2">
+        <span>รวมทั้งหมด:</span>
+        <span id="totalPrice" class="font-extrabold text-xl">฿0.00</span>
+      </div>
+
+      <!-- ปุ่มกลับ -->
+      <div class="mt-6">
+        <a href="/orders"
+          class="inline-block bg-[#543310] text-[#F8F4E1] px-6 py-3 rounded-full hover:bg-[#6A4525] transition">
+          กลับไปหน้าคำสั่งซื้อ
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- คำนวณราคารวม-->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let total = 0;
+      document.querySelectorAll("#order-items tr").forEach(row => {
+        const subtotalText = row.querySelector(".subtotal")?.textContent.replace("฿", "") || "0";
+        const subtotal = parseFloat(subtotalText);
+        if (!isNaN(subtotal)) total += subtotal;
+      });
+      document.getElementById("totalPrice").textContent = `฿${total.toFixed(2)}`;
+    });
+  </script>
 </body>
-
 </html>
