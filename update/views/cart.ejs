@@ -76,24 +76,78 @@
 
             const row = document.createElement("tr");
             row.innerHTML = `
-            <td class='border py-2'><img src="${item.image_product}" alt="${item.productName}" class='w-20 h-auto rounded-lg mx-auto'></td>
-            <td class='border py-2'>${item.productName}</td>
-            <td class='border py-2 text-[#543310] font-bold'>฿${item.price.toFixed(2)}</td>
-            <td class='border py-2'>${item.sweetness}</td>
-            <td class='border py-2'>${item.quantity}</td>
-            <td class='border py-2 text-[#543310] font-bold'>฿${itemTotal.toFixed(2)}</td>
-            <td class='border py-2'>
-              <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full transition" data-name="${item.productName}">
-                ลบ
-              </button>
-            </td>
-          `;
+                <td class='border py-2'>
+                  <img src="${item.image_product}" alt="${item.productName}" class='w-20 h-auto rounded-lg mx-auto'>
+                </td>
+                <td class='border py-2'>${item.productName}</td>
+                <td class='border py-2 text-[#543310] font-bold'>฿${item.price.toFixed(2)}</td>
+                <td class='border py-2'>${item.sweetness}</td>
+                <td class='border py-2'>
+                  <div class="flex justify-center items-center space-x-3">
+                    <button class="decrease-btn bg-[#543310] text-white px-2 py-1 rounded-full hover:bg-[#6A4525]"
+                      data-name="${item.productName}">-</button>
+                    <span class="font-semibold text-[#543310]" id="qty-${item.productName.replace(/\s/g, '-')}">
+                      ${item.quantity}
+                    </span>
+                    <button class="increase-btn bg-[#543310] text-white px-2 py-1 rounded-full hover:bg-[#6A4525]"
+                      data-name="${item.productName}">+</button>
+                  </div>
+                </td>
+                <td class='border py-2 text-[#543310] font-bold'>฿${itemTotal.toFixed(2)}</td>
+                <td class='border py-2'>
+                  <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full font-semibold transition"
+                    data-name="${item.productName}">ลบ</button>
+                </td>
+              `;
             cartList.appendChild(row);
           });
 
           document.getElementById("totalPrice").textContent = `฿${total.toFixed(2)}`;
         } catch (err) {
           console.error("Error loading cart:", err);
+        }
+      }
+
+      document.addEventListener("click", async (e) => {
+        // ปุ่มเพิ่มจำนวน
+        if (e.target.classList.contains("increase-btn")) {
+          const name = e.target.dataset.name;
+          const qtyEl = document.getElementById(`qty-${name.replace(/\s/g, '-')}`);
+          const newQty = parseInt(qtyEl.textContent) + 1;
+          await updateQuantity(name, newQty);
+        }
+
+        // ปุ่มลดจำนวน
+        if (e.target.classList.contains("decrease-btn")) {
+          const name = e.target.dataset.name;
+          const qtyEl = document.getElementById(`qty-${name.replace(/\s/g, '-')}`);
+          const currentQty = parseInt(qtyEl.textContent);
+          if (currentQty > 1) {
+            await updateQuantity(name, currentQty - 1);
+          }
+        }
+
+        // ปุ่มลบสินค้า
+        if (e.target.classList.contains("delete-btn")) {
+          const name = e.target.dataset.name;
+          if (confirm(`ต้องการลบ "${name}" ออกจากตะกร้าหรือไม่?`)) {
+            await fetch(`/removeFromCart/${encodeURIComponent(name)}`, { method: "DELETE" });
+            loadCart();
+          }
+        }
+      });
+
+      async function updateQuantity(productName, newQty) {
+        const res = await fetch("/updateCartQuantity", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productName, quantity: newQty })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadCart();
+        } else {
+          alert("เกิดข้อผิดพลาดในการอัปเดตจำนวนสินค้า");
         }
       }
 
@@ -156,7 +210,6 @@
         });
       });
 
-
       // ปุ่มชำระเงิน
       document.getElementById("payBtn").addEventListener("click", () => {
         const totalPrice = document.getElementById("totalPrice").textContent.replace("฿", "");
@@ -170,4 +223,3 @@
 </body>
 
 </html>
-
