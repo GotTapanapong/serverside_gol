@@ -169,7 +169,6 @@ app.get('/cart', (req, res) => {
 
 app.post("/addToCart", (req, res) => {
     const { productName, price, quantity, sweetness, image_product } = req.body;
-    // ลบ toppings ออก
     const cartItem = { productName, price, quantity, sweetness, image_product };
     if (!req.session.cart) {
         req.session.cart = [];
@@ -190,7 +189,38 @@ app.get("/payment", (req, res) => {
     res.render("payment", { id_user });
 });
 
-// POST: สร้าง Order และบันทึกรายการสินค้า (เวอร์ชันตัด Topping ออก)
+// DELETE: ลบสินค้าจากตะกร้า
+app.delete("/removeFromCart/:productName", (req, res) => {
+    const { productName } = req.params;
+
+    if (!req.session.cart) {
+        return res.json({ success: false, message: "ไม่มีตะกร้าใน session" });
+    }
+
+    req.session.cart = req.session.cart.filter(item => item.productName !== decodeURIComponent(productName));
+
+    return res.json({ success: true, message: "ลบสินค้าสำเร็จ!" });
+});
+
+// PATCH: อัปเดตจำนวนสินค้าในตะกร้า
+app.patch("/updateCartQuantity", (req, res) => {
+    const { productName, quantity } = req.body;
+
+    if (!req.session.cart) {
+        return res.json({ success: false, message: "ไม่มีตะกร้าใน session" });
+    }
+
+    const product = req.session.cart.find(item => item.productName === productName);
+    if (product) {
+        product.quantity = Math.max(1, quantity); // ห้ามต่ำกว่า 1
+        return res.json({ success: true, cart: req.session.cart });
+    }
+
+    res.json({ success: false, message: "ไม่พบสินค้าในตะกร้า" });
+});
+
+
+// POST: สร้าง Order และบันทึกรายการสินค้า
 app.post('/create-order', async (req, res) => {
     if (!req.session.cart || req.session.cart.length === 0) {
         return res.status(400).json({ success: false, message: "ตะกร้าสินค้าว่างเปล่า" });
@@ -212,7 +242,7 @@ app.post('/create-order', async (req, res) => {
             });
         });
 
-        console.log(`✅ Order created with ID: ${newOrderId}`);
+        console.log(`Order created with ID: ${newOrderId}`);
 
         for (const item of cart) {
             const product = await new Promise((resolve, reject) => {
@@ -222,7 +252,6 @@ app.post('/create-order', async (req, res) => {
                 });
             });
 
-            // SQL ที่ตัด topping_id ออก
             const itemSql = `INSERT INTO order_items (order_id, product_id, quantity, price, sweetness_level) VALUES (?, ?, ?, ?, ?)`;
             await new Promise((resolve, reject) => {
                 db.run(itemSql, [newOrderId, product.product_id, item.quantity, item.price, item.sweetness], function (err) {
@@ -237,12 +266,10 @@ app.post('/create-order', async (req, res) => {
         res.status(201).json({ success: true, message: 'สร้างคำสั่งซื้อสำเร็จ!', orderId: newOrderId });
 
     } catch (error) {
-        console.error('❌ Error in /create-order:', error.message);
+        console.error(' Error in /create-order:', error.message);
         res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์', error: error.message });
     }
 });
-
-// ในไฟล์ index.js ให้หา Route นี้แล้ววางทับของเดิม
 
 app.post("/upload", upload.single("receipt"), (req, res) => {
     if (!req.file) {
@@ -252,17 +279,15 @@ app.post("/upload", upload.single("receipt"), (req, res) => {
     const user_id = req.session.user ? req.session.user.userid : 'guest';
     const receiptBuffer = req.file.buffer;
 
-    // เพิ่ม 2 บรรทัดนี้เข้ามาใหม่
     const transaction_id = `TXN${Date.now()}`;
     const payment_method = "e-wallet";
 
-    // แก้ไข SQL query ให้มี transaction_id
     const insertQuery = `INSERT INTO payments (order_id, user_id, receipt, payment_status, payment_method, transaction_id) VALUES (?, ?, ?, 'pending', ?, ?)`;
     
     // เพิ่ม transaction_id เข้าไปใน array
     db.run(insertQuery, [order_id, user_id, receiptBuffer, payment_method, transaction_id], function (err) {
         if (err) {
-            console.error("❌ Error inserting payment:", err.message);
+            console.error(" Error inserting payment:", err.message);
             return res.status(500).json({ message: "เกิดข้อผิดพลาดในการบันทึกข้อมูล", error: err.message });
         }
         res.json({ success: true, message: "✅ อัปโหลดใบเสร็จสำเร็จ!", payment_id: this.lastID });
@@ -450,17 +475,13 @@ app.get('/addmenu', (req, res) => {
     res.render('addmenu', { id_user });
 });
 
-// ในไฟล์ index.js ให้หา Route นี้แล้ววางทับของเดิม
-
-// ในไฟล์ index.js ให้หา Route นี้แล้ววางทับของเดิม
-
 app.get('/get-products', (req, res) => {
     // แก้ไข: เลือกเฉพาะคอลัมน์ที่มีอยู่จริงในตาราง products ของคุณ
     const query = 'SELECT product_id, product_name, price, image_product FROM products';
 
     db.all(query, [], (err, rows) => {
         if (err) {
-            console.error("❌ Database error in /get-products:", err.message);
+            console.error(" Database error in /get-products:", err.message);
             return res.status(500).json({ success: false, message: 'ไม่สามารถดึงข้อมูลสินค้าได้' });
         }
         try {
@@ -473,7 +494,7 @@ app.get('/get-products', (req, res) => {
             // ส่งข้อมูลกลับไปเป็น JSON ที่มี success: true
             res.json({ success: true, products: productsWithImage });
         } catch (e) {
-            console.error("❌ Error processing product images:", e.message);
+            console.error(" Error processing product images:", e.message);
             res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการแปลงข้อมูลรูปภาพ' });
         }
     });
@@ -533,7 +554,7 @@ app.post('/add-product', upload.single('image_product'), (req, res) => {
     const query = `INSERT INTO products (product_name, price, description, image_product) VALUES (?, ?, ?, ?)`;
     db.run(query, [product_name, price, description, imageProduct], function (err) {
         if (err) {
-            console.error("❌ Error adding product:", err.message);
+            console.error("Error adding product:", err.message);
             return res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูล!' });
         }
         res.json({ success: true, message: 'เพิ่มสินค้าสำเร็จ!' });
